@@ -340,6 +340,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                       ),
 
                       //currentWindSpeed
+
                       //2
                       AdditionalInfoItem(
                         icon: Icons.air,
