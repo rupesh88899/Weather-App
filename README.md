@@ -2,8 +2,10 @@
 
 A new Flutter project.
 
-### NOTE!! - to do
-search bar is not working fix it
+### NOTE!! - to do  ✅ all errors are now fixed on date 20/6/2024
+1. search bar is not working fix it
+2. enter key to search not working
+3. no rain icon 
 
 ## Getting Started
 
