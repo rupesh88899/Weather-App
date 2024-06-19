@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:weather_app/additional_info_item.dart';
 import 'package:weather_app/hourly_forcast_item.dart';
@@ -18,16 +17,16 @@ class WeatherScreen extends StatefulWidget {
 
 class _WeatherScreenState extends State<WeatherScreen> {
 //controller for search bar
-  TextEditingController searchContoller = TextEditingController();
+  final TextEditingController searchController = TextEditingController();
 
 //by refreshing this variable will store the current weather
   late Future<Map<String, dynamic>> weather;
+  String cityName = 'London';
 
 //future fuction to get data from API
-  Future<Map<String, dynamic>> getCurrentWeather() async {
+  Future<Map<String, dynamic>> getCurrentWeather(String cityName) async {
 //check for error
     try {
-      String cityName = 'London';
       final res = await http.get(
         Uri.parse(
             'https://api.openweathermap.org/data/2.5/forecast?q=$cityName&APPID=$openWeatherAPIKey'),
@@ -52,12 +51,12 @@ class _WeatherScreenState extends State<WeatherScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    weather = getCurrentWeather();
+    weather = getCurrentWeather(cityName);
   }
 
   @override
   Widget build(BuildContext context) {
-//  variable to so some rendom city's name in search bar hint text
+//variable to so some rendom city's name in search bar hint text
     var cityNames = ['India', 'London', 'bhopal', 'France', 'Australia'];
     final random = Random();
     var city = cityNames[random.nextInt(cityNames.length)];
@@ -78,8 +77,8 @@ class _WeatherScreenState extends State<WeatherScreen> {
           IconButton(
             onPressed: () {
               setState(() {
-                //this will rebuild whole build function due to which our data also refreshes
-                weather = getCurrentWeather();
+//this will rebuild whole build function due to which our data also refreshes
+                weather = getCurrentWeather(cityName);
               });
             },
             icon: const Icon(Icons.refresh),
@@ -92,46 +91,46 @@ class _WeatherScreenState extends State<WeatherScreen> {
         child: FutureBuilder(
           future: weather,
           builder: (context, snapshot) {
-            //loding handelling
+//loding handelling
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator.adaptive());
             }
 
-            //error handelling
+//error handelling
             if (snapshot.hasError) {
               return Center(child: Text(snapshot.error.toString()));
             }
 
-            //data handelling
+//data handelling
             final data = snapshot.data!;
 
-            //variable to get data of curent weather
+//variable to get data of curent weather
             final currentWeatherData = data['list'][0];
 
-            //temperature
+//temperature
             final currentTemp = double.parse(
               (currentWeatherData['main']['temp'] - 273.15).toStringAsFixed(2),
             );
 
-            //sky type
+//sky type
             final currentSky = currentWeatherData['weather'][0]['main'];
 
-            //currentPresure
-            final currentPresure = currentWeatherData['main']['pressure'];
+//currentPresure
+            final currentPressure = currentWeatherData['main']['pressure'];
 
-            //currentWindSpeed
+//currentWindSpeed
             final currentWindSpeed = currentWeatherData['wind']['speed'];
 
-            //currentHumidity
+//currentHumidity
             final currentHumidity = currentWeatherData['main']['humidity'];
 
-            //UI starts from herez
+//UI starts from here
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  //search bar
+//search bar
                   Container(
                     padding: const EdgeInsets.all(6),
                     margin: const EdgeInsets.fromLTRB(5, 0, 5, 28),
@@ -144,7 +143,10 @@ class _WeatherScreenState extends State<WeatherScreen> {
                         //icon
                         GestureDetector(
                           onTap: () {
-                            city = searchContoller.text;
+                            setState(() {
+                              cityName = searchController.text;
+                              weather = getCurrentWeather(cityName);
+                            });
                           },
                           child: Container(
                             margin: const EdgeInsets.fromLTRB(3, 0, 7, 0),
@@ -155,19 +157,27 @@ class _WeatherScreenState extends State<WeatherScreen> {
                         //sarch textfiled
                         Expanded(
                           child: TextField(
-                            controller: searchContoller,
+                            controller: searchController,
                             decoration: InputDecoration(
                               hintText: 'Search $city',
                               hintStyle: const TextStyle(color: Colors.white30),
                               border: InputBorder.none,
                             ),
+
+// Added this onSubmitted property to trigger search on Enter key press
+                            onSubmitted: (value) {
+                              setState(() {
+                                cityName = value;
+                                weather = getCurrentWeather(cityName);
+                              });
+                            },
                           ),
                         ),
                       ],
                     ),
                   ),
 
-                  //main card
+//main card
                   SizedBox(
                     width: double.infinity,
                     child: Card(
@@ -199,12 +209,17 @@ class _WeatherScreenState extends State<WeatherScreen> {
                                 ),
                                 //mian card icon
                                 Icon(
-                                  currentSky == 'Clouds' ||
-                                          currentSky == 'Clear'
+                                  currentSky == 'Clouds'
                                       ? Icons.cloud
-                                      : Icons.sunny,
+                                      : currentSky == 'Clear'
+                                          ? Icons.sunny
+                                          : currentSky == 'Rain'
+                                              ? Icons.cloudy_snowing
+                                              : Icons
+                                                  .error, // fallback icon for unexpected values
                                   size: 65,
                                 ),
+
                                 const SizedBox(
                                   height: 16,
                                 ),
@@ -225,7 +240,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
                   const SizedBox(height: 20),
 
-                  //Hourly forcast start here
+//Hourly forcast start here
                   const Text(
                     'Weather Forecast',
                     style: TextStyle(
@@ -258,7 +273,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                   //   ),
                   // ),
 
-                  //Hourly forcast row cards  - using listview.builder
+//Hourly forcast row cards  - using listview.builder
 
                   SizedBox(
                     height: 120,
@@ -274,7 +289,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
                           //temp
                           final hourleyTemp = double.parse(
-                              (currentWeatherData['main']['temp'] - 273.15)
+                              (hourlyForecast['main']['temp'] - 273.15)
                                   .toStringAsFixed(2));
 
                           //time
@@ -284,9 +299,15 @@ class _WeatherScreenState extends State<WeatherScreen> {
                           return HourlyForecastItem(
                             //00.00 , 03.00 , 06:00 ,09:00, 12:00 ,15:00, ...........
                             time: DateFormat.j().format(time),
-                            icon: hourlySky == 'Clouds' || hourlySky == 'Clear'
+                            icon: hourlySky == 'Clouds'
                                 ? Icons.cloud
-                                : Icons.sunny,
+                                : hourlySky == 'Clear'
+                                    ? Icons.sunny
+                                    : hourlySky == 'Rain'
+                                        ? Icons.cloudy_snowing
+                                        : Icons
+                                            .error, // fallback icon for unexpected values ,
+
                             temperature: '$hourleyTemp °C',
                           );
                         }),
@@ -294,7 +315,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
                   const SizedBox(height: 20),
 
-                  //additional information
+//additional information
 
                   const Text(
                     'Additional Information',
@@ -306,7 +327,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
                   const SizedBox(height: 8),
 
-                  //three card like widgets are start from here
+//three card like widgets are start from here
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
@@ -330,8 +351,8 @@ class _WeatherScreenState extends State<WeatherScreen> {
                       //3
                       AdditionalInfoItem(
                         icon: Icons.beach_access,
-                        label: 'presseur',
-                        value: currentPresure.toString(),
+                        label: 'Presseur',
+                        value: currentPressure.toString(),
                       ),
                     ],
                   )
