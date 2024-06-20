@@ -23,7 +23,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
   late Future<Map<String, dynamic>> weather;
   String cityName = 'London';
 
-//future fuction to get data from API
+//future fucntion to get data from API
   Future<Map<String, dynamic>> getCurrentWeather(String cityName) async {
 //check for error
     try {
@@ -352,7 +352,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                       //3
                       AdditionalInfoItem(
                         icon: Icons.beach_access,
-                        label: 'Presseur',
+                        label: 'Pressure',
                         value: currentPressure.toString(),
                       ),
                     ],

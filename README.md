@@ -2,8 +2,7 @@
 
 A new Flutter project.
 
-### NOTE!! - to do
-search bar is not working fix it
+
 
 ## Getting Started
 
