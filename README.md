@@ -2,7 +2,14 @@
 
 A new Flutter project.
 
+<<<<<<< HEAD
 
+=======
+### NOTE!! - to do  ✅ all errors are now fixed on date 20/6/2024
+✅1. search bar is not working fix it  
+✅2. enter key to search not working
+✅3. no rain icon 
+>>>>>>> 0487aa8012541e38917fd4d4c49b637cdf8a6de5
 
 ## Getting Started
 
