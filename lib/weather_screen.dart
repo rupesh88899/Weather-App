@@ -6,7 +6,6 @@ import 'package:weather_app/additional_info_item.dart';
 import 'package:weather_app/hourly_forcast_item.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
-import 'package:weather_app/secrets.dart';
 
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen({super.key});
@@ -29,7 +28,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
     try {
       final res = await http.get(
         Uri.parse(
-            'https://api.openweathermap.org/data/2.5/forecast?q=$cityName&APPID=$openWeatherAPIKey'),
+            'https://api.openweathermap.org/data/2.5/forecast?q=$cityName&APPID=e8af6c2ed3c83d7f08797c1be73fcfbe'),
       );
 
       final data = jsonDecode(res.body);
